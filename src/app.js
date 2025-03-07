@@ -28,9 +28,12 @@ app.listen(process.env.PORT || 4000, () => {
 // Routes Import
 //routes import
 import userRouter from "./routes/user.routes.js";
+import scraperRoutes from "./routes/scraper.routes.js";
+
 
 //routes declaration
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/scraper", scraperRoutes);
 
 export default app;
