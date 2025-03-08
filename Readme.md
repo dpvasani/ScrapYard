@@ -1,4 +1,4 @@
-# Backend-Template
+# Scrapyard
 
 This repository provides a production-grade backend template for Node.js applications using Express.js and MongoDB. It includes a foundational structure, environment configuration, and a basic User model to help jump start backend development.
 
@@ -15,7 +15,7 @@ This repository provides a production-grade backend template for Node.js applica
 ## Folder Structure
 
 ```bash
-Backend-Template/
+Scrapyard/
 ├── public/                    # Public assets (if any)
 │   └── temp/                  # Temporary files or uploads
 ├── src/                       # Main application code
