@@ -28,12 +28,16 @@ app.listen(process.env.PORT || 4000, () => {
 // Routes Import
 //routes import
 import userRouter from "./routes/user.routes.js";
-import scraperRoutes from "./routes/scraper.routes.js";
+import searchRoutes from "./routes/search.routes.js";
+import approvalRoutes from "./routes/approval.routes.js";
+import getRoutes from "./routes/get.routes.js";
 
 
 //routes declaration
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/scraper", scraperRoutes);
+app.use("/api/v1/search", searchRoutes);
+app.use("/api/v1/approve", approvalRoutes);
+app.use("/api/v1/get", getRoutes);
 
 export default app;
