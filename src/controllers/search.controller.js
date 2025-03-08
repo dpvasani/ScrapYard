@@ -14,7 +14,7 @@ export const searchAndSaveResults = async (req, res) => {
     const searchId = lastEntry ? lastEntry.searchId + 1 : 1;
 
     // Fetch search results
-    const searchResults = await fetchSearchResults(keywords, 150); // Fetch up to 150 links
+    let searchResults = await fetchSearchResults(keywords, 150); // Try fetching up to 150 links
 
     // Ensure minimum 10 results
     if (searchResults.length < 10) {
@@ -41,23 +41,24 @@ export const searchAndSaveResults = async (req, res) => {
 const fetchSearchResults = async (keywords, maxResults = 150) => {
   try {
     const searchQuery = keywords.join(" ");
-    const searchResults = [];
-    let startIndex = 1;
-    
-    while (searchResults.length < maxResults) {
+    let searchResults = [];
+    let resultsFetched = 0;
+
+    while (resultsFetched < maxResults) {
+      const remainingResults = Math.min(10, maxResults - resultsFetched); // Fetch only what's needed
       const response = await axios.get(`https://www.googleapis.com/customsearch/v1`, {
         params: {
           key: process.env.GOOGLE_API_KEY,
           cx: process.env.GOOGLE_CX_ID,
           q: searchQuery,
-          num: 10, // Get 10 results per request
-          start: startIndex,
+          num: remainingResults, // Get up to 10 results at a time
+          start: resultsFetched + 1, // Adjust start index dynamically
         },
       });
 
-      if (!response.data.items) break;
+      if (!response.data.items) break; // Stop if no more results are available
 
-      response.data.items.forEach((item, index) => {
+      response.data.items.forEach((item) => {
         searchResults.push({
           title: item.title,
           description: item.snippet,
@@ -67,8 +68,8 @@ const fetchSearchResults = async (keywords, maxResults = 150) => {
         });
       });
 
-      startIndex += 10;
-      if (response.data.items.length < 10) break; // Stop if fewer results are returned
+      resultsFetched = searchResults.length; // Update fetched count
+      if (response.data.items.length < remainingResults) break; // Stop if fewer results returned
     }
 
     return searchResults;
@@ -78,7 +79,8 @@ const fetchSearchResults = async (keywords, maxResults = 150) => {
   }
 };
 
-// Fallback: Search each keyword separately if results are less than 10
+
+// **Fallback: Search each keyword separately if results are less than 10**
 const fetchAdditionalResults = async (keywords, requiredResults) => {
   let additionalResults = [];
   for (const keyword of keywords) {
@@ -90,7 +92,7 @@ const fetchAdditionalResults = async (keywords, requiredResults) => {
           key: process.env.GOOGLE_API_KEY,
           cx: process.env.GOOGLE_CX_ID,
           q: keyword,
-          num: 10, // Get 10 results per request
+          num: 10, // Fetch 10 results per request
         },
       });
 
